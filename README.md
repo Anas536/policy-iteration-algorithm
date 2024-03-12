@@ -52,25 +52,42 @@ To summarize, policy iteration iteratively improves the policy by alternating be
 ```
 # Name: Mohamed Anas 0.I
 # Reg No: 212223110028
-def policy_evaluation(pi, P, gamma=1.0, theta=1e-10):
-    prev_V = np.zeros(len(P), dtype=np.float64)
-    while True:
-        V = np.zeros(len(P), dtype=np.float64)
-        for s in range(len(P)):
-            for prob, next_state, reward, done in P[s][pi(s)]:
-                V[s] += prob * (reward + gamma * prev_V[next_state] * (not done))
-        if np.max(np.abs(prev_V - V)) < theta:
-            break
-        prev_V = V.copy()
-    return V
+
+def policy_improvement(V, P, gamma=1.0):
+    Q = np.zeros((len(P), len(P[0])), dtype=np.float64)
+    # Write your code here to implement policy improvement algorithm
+    for s in range(len(P)):
+      for a in range(len(P[s])):
+        for prob, next_state,reward, done in P[s][a]:
+          Q[s][a]+= prob*(reward+gamma*V[next_state]*(not done))
+          new_pi = lambda s: {s:a for s, a in enumerate(np.argmax(Q, axis=1))}[s]
+
+    return new_pi
 ```
 
 ## POLICY ITERATION FUNCTION
-Include the policy iteration function
+```
+# Name: Mohamed Anas 0.I
+# Reg No: 212223110028
+
+def policy_iteration(P, gamma=1.0, theta=1e-10):
+    random_actions = np.random.choice(tuple(P[0].keys()), len(P))
+    # Write your code here to implement the policy iteration algorithm
+    pi = lambda s: {s:a for s, a in enumerate(random_actions)}[s]
+    while True:
+      old_pi = {s:pi(s) for s in range(len(P))}
+      V = policy_evaluation(pi, P,gamma,theta)
+      pi = policy_improvement(V,P,gamma)
+      if old_pi == {s:pi(s) for s in range(len(P))}:
+        break
+    return V, pi
+```
 
 ## OUTPUT:
-Mention the optimal policy, optimal value function , success rate for the optimal policy.
+
+![Screenshot 2024-03-12 143505](https://github.com/Anas536/policy-iteration-algorithm/assets/139841834/5a2c6c47-4efc-4b7d-a7cc-6a80efd054d7)
+
 
 ## RESULT:
 
-Write your result here
+Thus, a program is developed to perform policy iteration for the given MDP.
